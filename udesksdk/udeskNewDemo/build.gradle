@@ -8,12 +8,11 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdk 33
 
     defaultConfig {
         applicationId "udesk.sdk.demo"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -38,7 +37,7 @@ android {
 }
 
 dependencies {
-    api 'com.android.support:multidex:1.0.3'
+    api 'androidx.multidex:multidex:2.0.1'
     api files('libs/jpush-android-2.2.0.jar')
     api files('libs/AMap2DMap_5.2.0_AMapSearch_5.3.0_AMapLocation_3.5.0_20170814.jar')
     //    implementation project(path: ':UdeskSDKUI', configuration: 'default')

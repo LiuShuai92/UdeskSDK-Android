@@ -10,12 +10,12 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -32,8 +32,7 @@ import java.util.List;
 
 import cn.udesk.R;
 import cn.udesk.UdeskUtil;
-import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import cn.udesk.photoselect.adapter.FolderAdapter;
 import cn.udesk.photoselect.adapter.PhotosAdapter;
 import cn.udesk.photoselect.decoration.GridSpacingItemDecoration;
@@ -84,7 +83,7 @@ public class PhotoSelectorActivity extends FragmentActivity implements View.OnCl
             disPlayHeghit = wm1.getDefaultDisplay().getHeight();
             setContentView(R.layout.udesk_activity_select);
             if (!Fresco.hasBeenInitialized()) {
-                  UdeskUtil.frescoInit(this);
+                UdeskUtil.frescoInit(this);
             }
             initView();
         } catch (Exception e) {
@@ -135,21 +134,30 @@ public class PhotoSelectorActivity extends FragmentActivity implements View.OnCl
             if (Build.VERSION.SDK_INT < 23) {
                 readLocalMedia();
             } else {
-                XPermissionUtils.requestPermissions(PhotoSelectorActivity.this, RequestCode.EXTERNAL,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        new XPermissionUtils.OnPermissionListener() {
+                String[] permissions;
+                if (Build.VERSION.SDK_INT < 33) {
+                    permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+                } else {
+                    permissions = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
+                }
+                RunPermissionHelper.INSTANCE.requestRunPermission(PhotoSelectorActivity.this,
+                        false,
+                        true,
+                        getString(R.string.photo_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
-                                readLocalMedia();
+                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
+                                Toast.makeText(PhotoSelectorActivity.this,
+                                        getResources().getString(R.string.file_denied),
+                                        Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
-                                Toast.makeText(getApplicationContext(),
-                                        getResources().getString(R.string.photo_denied),
-                                        Toast.LENGTH_SHORT).show();
+                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                                readLocalMedia();
                             }
-                        });
+                        },
+                        permissions);
             }
             setViewEneable();
         } catch (Exception e) {
@@ -419,7 +427,6 @@ public class PhotoSelectorActivity extends FragmentActivity implements View.OnCl
             foldersList.clear();
             localMedias.clear();
             SelectResult.clear();
-            XPermissionUtils.destory();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -44,8 +44,6 @@ public class CaptureLayout extends FrameLayout {
     private int button_size;
 
 
-//    private boolean isFirst = true;
-
     public CaptureLayout(Context context) {
         this(context, null);
     }

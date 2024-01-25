@@ -1094,7 +1094,7 @@ public class UdeskUtil {
         } finally {
             try {
                 retriever.release();
-            } catch (RuntimeException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

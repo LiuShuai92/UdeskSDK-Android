@@ -47,6 +47,14 @@
     <string name="udesk_agent_inti">Agent connecting,please wait&#8230;</string>
     <string name="udesk_agent_connecting_error_net_uavailabl">Failed connection, please try later!</string>
 
+    <string name="file_direction">Sending files requires permission to read from the memory card</string>
+    <string name="call_direction">Requires permission to make phone calls</string>
+    <string name="record_direction">Recording requires recording permission</string>
+    <string name="video_direction">Video call function requires camera permission and recording permission</string>
+    <string name="camera_direction">Taking pictures requires permission to take pictures</string>
+    <string name="location_direction">To use the send location function, location permission is required</string>
+    <string name="photo_direction">To send pictures, picture reading permission is required</string>
+
     <string name="udesk_edit_hint_msg">Typing...</string>
     <string name="udesk_voice_init">Hold to talk</string>
     <string name="udesk_label_hint_cancel">Release to cancel</string>

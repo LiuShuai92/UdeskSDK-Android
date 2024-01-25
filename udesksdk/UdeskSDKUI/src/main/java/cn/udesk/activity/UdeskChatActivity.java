@@ -19,9 +19,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -77,8 +77,7 @@ import cn.udesk.model.SDKIMSetting;
 import cn.udesk.model.SurveyOptionsModel;
 import cn.udesk.model.UdeskCommodityItem;
 import cn.udesk.model.UdeskQueueItem;
-import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import cn.udesk.photoselect.PhotoSelectorActivity;
 import cn.udesk.photoselect.entity.LocalMedia;
 import cn.udesk.presenter.ChatActivityPresenter;
@@ -252,7 +251,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                     setTitlebar(context.getResources().getString(
                             R.string.udesk_agent_connecting_error_net_uavailabl), "off");
                     currentStatusIsOnline = false;
-                    if (mHandler!=null && myRunnable!=null){
+                    if (mHandler != null && myRunnable != null) {
                         mHandler.removeCallbacks(myRunnable);
                     }
                 }
@@ -412,7 +411,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                         break;
                     case MessageWhat.onNewMessage:
                         MessageInfo msgInfo = (MessageInfo) msg.obj;
-                        if (msgInfo == null){
+                        if (msgInfo == null) {
                             return;
                         }
                         if (msgInfo.getMsgtype().equals(UdeskConst.ChatMsgTypeString.TYPE_REDIRECT)) {
@@ -740,26 +739,27 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                                     clickLocation();
                                     mBotomFramlayout.setVisibility(View.GONE);
                                 } else {
-                                    XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.LOCATION,
-                                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                    Manifest.permission.READ_PHONE_STATE},
-                                            new XPermissionUtils.OnPermissionListener() {
+                                    RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                                            false,
+                                            true,
+                                            getString(R.string.location_direction),
+                                            new RunPermissionHelper.OnRequestPermissionsListener() {
                                                 @Override
-                                                public void onPermissionGranted() {
-                                                    clickLocation();
-                                                    mBotomFramlayout.setVisibility(View.GONE);
-                                                }
-
-                                                @Override
-                                                public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                                                public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                                     Toast.makeText(UdeskChatActivity.this,
                                                             getResources().getString(R.string.location_denied),
                                                             Toast.LENGTH_SHORT).show();
                                                 }
-                                            });
+
+                                                @Override
+                                                public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+
+                                                    clickLocation();
+                                                    mBotomFramlayout.setVisibility(View.GONE);
+                                                }
+                                            },
+                                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                                            Manifest.permission.ACCESS_FINE_LOCATION);
                                 }
 
                                 break;
@@ -785,7 +785,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                 }
             });
             mListView = (UDPullGetMoreListView) findViewById(R.id.udesk_conversation);
-            mListView.addFooterView(LayoutInflater.from(this).inflate(R.layout.udesk_im_footview,null));
+            mListView.addFooterView(LayoutInflater.from(this).inflate(R.layout.udesk_im_footview, null));
             expandableLayout = (UdeskExpandableLayout) findViewById(R.id.udesk_change_status_info);
 
             mContentLinearLayout = (LinearLayout) findViewById(R.id.udesk_content_ll);
@@ -1265,24 +1265,37 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                         hideEmotionLayout();
                         hideMoreLayout();
                     } else {
-                        XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.AUDIO,
-                                new String[]{Manifest.permission.RECORD_AUDIO,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                new XPermissionUtils.OnPermissionListener() {
+                        String[] permissions;
+                        if (Build.VERSION.SDK_INT < 30) {
+                            permissions = new String[]{Manifest.permission.RECORD_AUDIO,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                        } else if (Build.VERSION.SDK_INT < 33) {
+                            permissions = new String[]{Manifest.permission.RECORD_AUDIO,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                        } else {
+                            permissions = new String[]{Manifest.permission.RECORD_AUDIO,
+                                    Manifest.permission.READ_MEDIA_AUDIO};
+                        }
+                        RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                                false,
+                                true,
+                                getString(R.string.record_direction),
+                                new RunPermissionHelper.OnRequestPermissionsListener() {
                                     @Override
-                                    public void onPermissionGranted() {
-                                        showAudioButton();
-                                        hideEmotionLayout();
-                                        hideMoreLayout();
-                                    }
-
-                                    @Override
-                                    public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                                    public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                         Toast.makeText(UdeskChatActivity.this,
                                                 getResources().getString(R.string.aduido_denied),
                                                 Toast.LENGTH_SHORT).show();
                                     }
-                                });
+
+                                    @Override
+                                    public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                                        showAudioButton();
+                                        hideEmotionLayout();
+                                        hideMoreLayout();
+                                    }
+                                },
+                                permissions);
                     }
 
                 }
@@ -1321,56 +1334,67 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
 
     //点击拍摄入口
     private void clickCamera() {
-
         if (Build.VERSION.SDK_INT < 23) {
             takePhoto();
             bottomoPannelBegginStatus();
-        } else {
-            XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.CAMERA,
-                    new String[]{Manifest.permission.CAMERA,
-                            Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    new XPermissionUtils.OnPermissionListener() {
-                        @Override
-                        public void onPermissionGranted() {
-                            takePhoto();
-                            bottomoPannelBegginStatus();
-                        }
-
-                        @Override
-                        public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
-                            Toast.makeText(UdeskChatActivity.this,
-                                    getResources().getString(R.string.camera_denied),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            return;
         }
+        RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                false,
+                true,
+                getString(R.string.camera_direction),
+                new RunPermissionHelper.OnRequestPermissionsListener() {
+                    @Override
+                    public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
+                        Toast.makeText(UdeskChatActivity.this,
+                                getResources().getString(R.string.camera_denied),
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                        takePhoto();
+                        bottomoPannelBegginStatus();
+                    }
+                },
+                Manifest.permission.CAMERA);
     }
 
     //点击相册入口
     private void clickPhoto() {
         try {
+            String[] permissions;
             if (Build.VERSION.SDK_INT < 23) {
                 selectPhoto();
                 bottomoPannelBegginStatus();
+                return;
+            } else if (Build.VERSION.SDK_INT < 33) {
+                permissions = new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE};
             } else {
-                XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.EXTERNAL,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        new XPermissionUtils.OnPermissionListener() {
-                            @Override
-                            public void onPermissionGranted() {
-                                selectPhoto();
-                                bottomoPannelBegginStatus();
-                            }
-
-                            @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
-                                Toast.makeText(UdeskChatActivity.this,
-                                        getResources().getString(R.string.photo_denied),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                permissions = new String[]{
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO};
             }
+            RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                    false,
+                    true,
+                    getString(R.string.photo_direction),
+                    new RunPermissionHelper.OnRequestPermissionsListener() {
+                        @Override
+                        public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
+                            Toast.makeText(UdeskChatActivity.this,
+                                    getResources().getString(R.string.photo_denied),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                            selectPhoto();
+                            bottomoPannelBegginStatus();
+                        }
+                    },
+                    permissions);
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
         }
@@ -1379,27 +1403,36 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
     //点击文件入口
     private void clickFile() {
         try {
+            String[] permissions;
             if (Build.VERSION.SDK_INT < 23) {
                 selectFile();
                 bottomoPannelBegginStatus();
+                return;
+            } else if (Build.VERSION.SDK_INT < 33) {
+                permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
             } else {
-                XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.EXTERNAL,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        new XPermissionUtils.OnPermissionListener() {
-                            @Override
-                            public void onPermissionGranted() {
-                                selectFile();
-                                bottomoPannelBegginStatus();
-                            }
-
-                            @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
-                                Toast.makeText(UdeskChatActivity.this,
-                                        getResources().getString(R.string.file_denied),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                permissions = new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE};
             }
+            RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                    false,
+                    true,
+                    getString(R.string.file_direction),
+                    new RunPermissionHelper.OnRequestPermissionsListener() {
+                        @Override
+                        public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
+
+                            Toast.makeText(UdeskChatActivity.this,
+                                    getResources().getString(R.string.file_denied),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                            selectFile();
+                            bottomoPannelBegginStatus();
+                        }
+                    },
+                    permissions);
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
         }
@@ -1468,11 +1501,14 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                 }
                 UdeskChatActivity.this.startActivity(intent);
             } else {
-                XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.CallPhone,
-                        new String[]{Manifest.permission.CALL_PHONE},
-                        new XPermissionUtils.OnPermissionListener() {
+
+                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                        false,
+                        true,
+                        getString(R.string.call_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
+                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(mobile));
                                 if (ActivityCompat.checkSelfPermission(UdeskChatActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                                     return;
@@ -1481,12 +1517,15 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
                             }
 
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
-                                Toast.makeText(UdeskChatActivity.this,
-                                        getResources().getString(R.string.call_denied),
-                                        Toast.LENGTH_SHORT).show();
+                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(mobile));
+                                if (ActivityCompat.checkSelfPermission(UdeskChatActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                    return;
+                                }
+                                UdeskChatActivity.this.startActivity(intent);
                             }
-                        });
+                        },
+                        Manifest.permission.CALL_PHONE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1665,7 +1704,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
             if (size >= 30 * 1024 * 1024) {
                 Toast.makeText(getApplicationContext(), getString(R.string.udesk_file_to_large), Toast.LENGTH_SHORT).show();
                 return;
-            }else if (size ==0){
+            } else if (size == 0) {
                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.udesk_file_not_exist));
                 return;
             }
@@ -2171,7 +2210,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
             }
             if (!currentStatusIsOnline && !isleaveMessageTypeMsg()) {
                 confirmToForm();
-                return false;
+                return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -3031,16 +3070,6 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
         return false;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        try {
-            XPermissionUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public void showVideoThumbnail(final MessageInfo info) {
 
@@ -3280,7 +3309,6 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
             if (popWindow != null && popWindow.isShowing()) {
                 popWindow.dismiss();
             }
-            XPermissionUtils.destory();
             functionItems.clear();
             new MyUpdateMsgRead().start();
             recycleVoiceRes();
@@ -3308,11 +3336,10 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IChatActivit
             if (queueItem != null) {
                 queueItem = null;
             }
-            if (mBtnAudio != null){
+            if (mBtnAudio != null) {
                 mBtnAudio.setRecordingListener(null);
                 mBtnAudio.destoryRelease();
             }
-            XPermissionUtils.destory();
             unRegister();
             UdeskHttpFacade.getInstance().cancel();
             InvokeEventContainer.getInstance().event_IsOver.unBind(this);

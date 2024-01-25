@@ -12,9 +12,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import io.agora.rtc.RtcEngine;
 import udesk.core.UdeskConst;
 import udesk.core.event.InvokeEventContainer;
@@ -154,11 +156,27 @@ public class UdeskVideoActivity extends Activity implements View.OnClickListener
                 initReceiveVideo();
                 startAlarm();
             }
-            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO) && checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA)) {
-                if (isInvete) {
-                    videoPresenter.setupLocalVideo(getApplicationContext(), big_video_view_container);
-                }
-            }
+
+            RunPermissionHelper.INSTANCE.requestRunPermission(this,
+                    false,
+                    true,
+                    getString(R.string.video_direction),
+                    new RunPermissionHelper.OnRequestPermissionsListener() {
+                        @Override
+                        public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
+                            showLongToast("No permission");
+                            finish();
+                        }
+
+                        @Override
+                        public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                            if (isInvete) {
+                                videoPresenter.setupLocalVideo(getApplicationContext(), big_video_view_container);
+                            }
+                        }
+                    },
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA);
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
             finish();

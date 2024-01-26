@@ -47,6 +47,14 @@
     <string name="udesk_agent_inti">客服连接中,请稍后&#8230;</string>
     <string name="udesk_agent_connecting_error_net_uavailabl">连接失败,稍后再试!</string>
 
+    <string name="file_direction">发送文件，需要存储卡读取的权限</string>
+    <string name="call_direction">需要呼叫电话的权限</string>
+    <string name="record_direction">发送录音，需要录音权限</string>
+    <string name="camera_direction">拍照需要拍照权限</string>
+    <string name="video_direction">视频通话功能，需要获取相机权限和录音权限</string>
+    <string name="location_direction">使用发送位置功能，需要定位权限</string>
+    <string name="photo_direction">获取图片，需要存储卡读取权限</string>
+
     <string name="udesk_edit_hint_msg">输入消息...</string>
     <string name="udesk_voice_init">按住说话</string>
 

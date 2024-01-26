@@ -32,7 +32,7 @@ import java.util.List;
 import cn.udesk.R;
 import cn.udesk.UdeskUtil;
 import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import cn.udesk.photoselect.adapter.FolderAdapter;
 import cn.udesk.photoselect.adapter.PhotosAdapter;
 import cn.udesk.photoselect.decoration.GridSpacingItemDecoration;
@@ -134,20 +134,24 @@ public class PhotoSelectorActivity extends FragmentActivity implements View.OnCl
                 if (Build.VERSION.SDK_INT >= 33) {
                     permissions = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
                 }
-                XPermissionUtils.requestPermissions(PhotoSelectorActivity.this, RequestCode.EXTERNAL, permissions,
-                        new XPermissionUtils.OnPermissionListener() {
+                RunPermissionHelper.INSTANCE.requestRunPermission(PhotoSelectorActivity.this,
+                        false,
+                        true,
+                        getString(R.string.record_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
+                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
                                 readLocalMedia();
                             }
 
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                 Toast.makeText(getApplicationContext(),
                                         getResources().getString(R.string.photo_denied),
                                         Toast.LENGTH_SHORT).show();
                             }
-                        });
+                        },
+                        permissions);
             }
             setViewEneable();
         } catch (Exception e) {
@@ -417,7 +421,6 @@ public class PhotoSelectorActivity extends FragmentActivity implements View.OnCl
             foldersList.clear();
             localMedias.clear();
             SelectResult.clear();
-            XPermissionUtils.destory();
         } catch (Exception e) {
             e.printStackTrace();
         }

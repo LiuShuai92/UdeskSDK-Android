@@ -7,8 +7,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion '29.0.0'
+    compileSdk 33
 
     defaultConfig {
         applicationId "udesk.sdk.demo"
@@ -48,7 +47,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     api project(':udeskvideo')
     api project(':udeskasr')

@@ -2,11 +2,24 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.androidTest~1.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.androidTest~1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.main~1.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.main~1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.unitTest~1.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskasr/com.github.udesk.udesksdk.udeskasr.unitTest~1.iml" />
       <module fileurl="file://$PROJECT_DIR$/udesksdk.iml" filepath="$PROJECT_DIR$/udesksdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.iml" filepath="$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.main.iml" filepath="$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/UdeskSDKUI/udesksdk.UdeskSDKUI.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskNewDemo/udesksdk.udeskNewDemo.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskasr/udesksdk.udeskasr.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskasr/udesksdk.udeskasr.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/udeskvideo/udesksdk.udeskvideo.unitTest.iml" />
     </modules>
   </component>
 </project>

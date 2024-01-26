@@ -27,13 +27,14 @@ import cn.udesk.UdeskSDKManager;
 import cn.udesk.UdeskUtil;
 import cn.udesk.activity.NavigationFragment;
 import cn.udesk.adapter.UdeskFunctionAdapter;
+import cn.udesk.camera.UdeskCameraActivity;
 import cn.udesk.config.UdeskConfig;
 import cn.udesk.emotion.EmotionKeyboard;
 import cn.udesk.emotion.EmotionLayout;
 import cn.udesk.emotion.LQREmotionKit;
 import cn.udesk.model.FunctionMode;
 import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import cn.udesk.voice.AudioRecordButton;
 import udesk.core.UdeskConst;
 import udesk.core.event.InvokeEventContainer;
@@ -109,7 +110,7 @@ public class UdeskAgentFragment extends UdeskbaseFragment implements View.OnClic
                         UdeskSDKManager.getInstance().getAppkey(getActivity().getApplicationContext()), UdeskSDKManager.getInstance().getSdkToken(getActivity().getApplicationContext()), UdeskConfig.UdeskPushFlag.ON,
                         UdeskSDKManager.getInstance().getRegisterId(getActivity().getApplicationContext()), UdeskSDKManager.getInstance().getAppId(getActivity().getApplicationContext()));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         super.onDestroy();
@@ -145,24 +146,28 @@ public class UdeskAgentFragment extends UdeskbaseFragment implements View.OnClic
                 public boolean getPermission() {
                     if (Build.VERSION.SDK_INT < 23) {
                         return true;
-                    }else {
+                    } else {
                         final boolean[] onPermissionGranted = {false};
-                        XPermissionUtils.requestPermissions(udeskChatActivity, RequestCode.AUDIO,
-                                new String[]{Manifest.permission.RECORD_AUDIO},
-                                new XPermissionUtils.OnPermissionListener() {
+                        RunPermissionHelper.INSTANCE.requestRunPermission(udeskChatActivity,
+                                false,
+                                true,
+                                getString(R.string.record_direction),
+                                new RunPermissionHelper.OnRequestPermissionsListener() {
                                     @Override
-                                    public void onPermissionGranted() {
+                                    public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+
                                         onPermissionGranted[0] = true;
                                     }
 
                                     @Override
-                                    public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                                    public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                         Toast.makeText(udeskChatActivity.getApplicationContext(),
                                                 getResources().getString(R.string.aduido_denied),
                                                 Toast.LENGTH_SHORT).show();
                                         onPermissionGranted[0] = false;
                                     }
-                                });
+                                },
+                                Manifest.permission.RECORD_AUDIO);
                         return onPermissionGranted[0];
                     }
                 }
@@ -203,25 +208,27 @@ public class UdeskAgentFragment extends UdeskbaseFragment implements View.OnClic
     /**
      * emoji的显示隐藏
      */
-    private void setEmojiVis(int vis){
-        if (View.VISIBLE == vis && UdeskSDKManager.getInstance().getUdeskConfig().isUseEmotion && LQREmotionKit.getEmotionPath() != null){
+    private void setEmojiVis(int vis) {
+        if (View.VISIBLE == vis && UdeskSDKManager.getInstance().getUdeskConfig().isUseEmotion && LQREmotionKit.getEmotionPath() != null) {
             mEmojiImg.setVisibility(vis);
-        }else {
+        } else {
             mEmojiImg.setVisibility(View.GONE);
         }
     }
 
     /**
      * 更多控件的显示隐藏
+     *
      * @param vis
      */
-    private void setMoreVis(int vis){
-        if (View.VISIBLE == vis && UdeskSDKManager.getInstance().getUdeskConfig().isUseMore){
+    private void setMoreVis(int vis) {
+        if (View.VISIBLE == vis && UdeskSDKManager.getInstance().getUdeskConfig().isUseMore) {
             mMoreImg.setVisibility(vis);
-        }else {
+        } else {
             mMoreImg.setVisibility(View.GONE);
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -322,7 +329,7 @@ public class UdeskAgentFragment extends UdeskbaseFragment implements View.OnClic
                             setMoreVis(View.GONE);
                         } else {
                             sendBtn.setVisibility(View.GONE);
-                            if (!(udeskChatActivity.imSetting != null && udeskChatActivity.imSetting.getEnable_web_im_feedback()) || TextUtils.equals(udeskChatActivity.curentStatus,UdeskConst.Status.chatting) || udeskChatActivity.isNeedQueueMessageSave()) {
+                            if (!(udeskChatActivity.imSetting != null && udeskChatActivity.imSetting.getEnable_web_im_feedback()) || TextUtils.equals(udeskChatActivity.curentStatus, UdeskConst.Status.chatting) || udeskChatActivity.isNeedQueueMessageSave()) {
                                 setMoreVis(View.VISIBLE);
                             }
                         }
@@ -529,7 +536,7 @@ public class UdeskAgentFragment extends UdeskbaseFragment implements View.OnClic
                 mBtnAudio.setRecordingListener(null);
                 mBtnAudio.destoryRelease();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -602,11 +609,11 @@ public class UdeskAgentFragment extends UdeskbaseFragment implements View.OnClic
                 if (vis == View.GONE) {
                     hideMoreLayout();
                     mEmotionKeyboard.hideEmotionLayout(true);
-                }else if (vis==View.VISIBLE){
-                    if (mInputEditView.getText().toString().length()>0){
+                } else if (vis == View.VISIBLE) {
+                    if (mInputEditView.getText().toString().length() > 0) {
                         setMoreVis(View.GONE);
                         sendBtn.setVisibility(View.VISIBLE);
-                    }else {
+                    } else {
                         setMoreVis(View.VISIBLE);
                         sendBtn.setVisibility(View.GONE);
                     }

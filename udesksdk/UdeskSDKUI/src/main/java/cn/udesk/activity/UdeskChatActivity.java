@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,8 +90,7 @@ import cn.udesk.model.Robot;
 import cn.udesk.model.SurveyOptionsModel;
 import cn.udesk.model.UdeskCommodityItem;
 import cn.udesk.model.UdeskQueueItem;
-import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import cn.udesk.photoselect.PhotoSelectorActivity;
 import cn.udesk.photoselect.entity.LocalMedia;
 import cn.udesk.voice.RecordFilePlay;
@@ -1570,19 +1570,21 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             if (Build.VERSION.SDK_INT < 23) {
                 takePhoto();
             } else {
-                XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.CAMERA,
-                        new String[]{Manifest.permission.CAMERA},
-                        new XPermissionUtils.OnPermissionListener() {
+                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                        false,
+                        true,
+                        getString(R.string.camera_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
+                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
                                 takePhoto();
                             }
-
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.camera_denied));
                             }
-                        });
+                        },
+                        Manifest.permission.CAMERA);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1595,22 +1597,26 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             if (Build.VERSION.SDK_INT < 23) {
                 selectPhoto();
             } else {
-                String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                 if (Build.VERSION.SDK_INT >= 33) {
                     permissions = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
                 }
-                XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.EXTERNAL, permissions,
-                        new XPermissionUtils.OnPermissionListener() {
+
+                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                        false,
+                        true,
+                        getString(R.string.photo_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
+                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
                                 selectPhoto();
                             }
-
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.photo_denied));
                             }
-                        });
+                        },
+                        permissions);
             }
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
@@ -1623,22 +1629,26 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             if (Build.VERSION.SDK_INT < 23) {
                 selectFile();
             } else {
-                String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                 if (Build.VERSION.SDK_INT >= 33) {
                     permissions = new String[]{Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
                 }
-                XPermissionUtils.requestPermissions(UdeskChatActivity.this, RequestCode.EXTERNAL, permissions,
-                        new XPermissionUtils.OnPermissionListener() {
+
+                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                        false,
+                        true,
+                        getString(R.string.file_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
+                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
                                 selectFile();
                             }
-
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.file_denied));
                             }
-                        });
+                        },
+                        permissions);
             }
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
@@ -3196,16 +3206,6 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
         return false;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        try {
-            XPermissionUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * video缩略图
      *
@@ -3370,7 +3370,6 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 popWindow.dismiss();
             }
             fragment.cleanSource();
-            XPermissionUtils.destory();
             recycleVoiceRes();
             if (mHandler != null && myRunnable != null) {
                 mHandler.removeCallbacks(myRunnable);

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.SurfaceView;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import io.agora.rtc.RtcEngine;
 import udesk.core.UdeskConst;
 import udesk.core.event.InvokeEventContainer;
@@ -154,11 +156,26 @@ public class UdeskVideoActivity extends Activity implements View.OnClickListener
                 initReceiveVideo();
                 startAlarm();
             }
-            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO) && checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA)) {
-                if (isInvete) {
-                    videoPresenter.setupLocalVideo(getApplicationContext(), big_video_view_container);
-                }
-            }
+            RunPermissionHelper.INSTANCE.requestRunPermission(this,
+                    false,
+                    true,
+                    getString(R.string.video_direction),
+                    new RunPermissionHelper.OnRequestPermissionsListener() {
+                        @Override
+                        public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
+                            showLongToast("No permission");
+                            finish();
+                        }
+
+                        @Override
+                        public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+                            if (isInvete) {
+                                videoPresenter.setupLocalVideo(getApplicationContext(), big_video_view_container);
+                            }
+                        }
+                    },
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA);
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
             finish();
@@ -262,40 +279,6 @@ public class UdeskVideoActivity extends Activity implements View.OnClickListener
             e.printStackTrace();
         }
         return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults) {
-
-        try {
-            switch (requestCode) {
-                case PERMISSION_REQ_ID_RECORD_AUDIO: {
-                    if (grantResults.length > 0
-                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA);
-                    } else {
-                        showLongToast("No permission for " + Manifest.permission.RECORD_AUDIO);
-                        finish();
-                    }
-                    break;
-                }
-                case PERMISSION_REQ_ID_CAMERA: {
-                    if (grantResults.length > 0
-                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        if (isInvete) {
-                            videoPresenter.setupLocalVideo(getApplicationContext(), big_video_view_container);
-                        }
-                    } else {
-                        showLongToast("No permission for " + Manifest.permission.CAMERA);
-                        finish();
-                    }
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public final void showLongToast(final String msg) {

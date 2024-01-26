@@ -26,8 +26,7 @@ import org.json.JSONObject;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import udesk.core.event.InvokeEventContainer;
 import udesk.udeskasr.AutoCheck;
 import udesk.udeskasr.R;
@@ -160,14 +159,14 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
                 audioText.setLength(0);
                 changVis(true, true, false, false);
             } else if (i == R.id.udesk_send) {
-                if (mASRText!=null&&mASRText.length()>0){
+                if (mASRText != null && mASRText.length() > 0) {
                     InvokeEventContainer.getInstance().event_OnAudioResult.invoke(mASRText.getText().toString());
                 }
                 finish();
-                overridePendingTransition(0,R.anim.udesk_audio_exit_anim);
+                overridePendingTransition(0, R.anim.udesk_audio_exit_anim);
             } else if (i == R.id.udesk_close) {
                 finish();
-                overridePendingTransition(0,R.anim.udesk_audio_exit_anim);
+                overridePendingTransition(0, R.anim.udesk_audio_exit_anim);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -176,6 +175,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
 
     /**
      * 识别编辑回调
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -185,8 +185,8 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
         super.onActivityResult(requestCode, resultCode, data);
         try {
             if (requestCode == UdeskConstant.UDESK_REQUEST_CODE && data != null) {
-                String text=data.getStringExtra(UdeskConstant.UDESK_EDIT_TEXT);
-                if (!TextUtils.isEmpty(text)){
+                String text = data.getStringExtra(UdeskConstant.UDESK_EDIT_TEXT);
+                if (!TextUtils.isEmpty(text)) {
                     mASRText.setText(text);
                     mASRText.setTextColor(getResources().getColor(R.color.udesk_color_212121));
                 }
@@ -208,23 +208,25 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
                 audioStart();
                 mic.start();
             } else {
-                XPermissionUtils.requestPermissions(UdeskASRActivity.this, RequestCode.ASR,
-                        new String[]{Manifest.permission.RECORD_AUDIO,
-                                Manifest.permission.INTERNET,
-                                Manifest.permission.READ_PHONE_STATE},
-                        new XPermissionUtils.OnPermissionListener() {
+                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskASRActivity.this,
+                        false,
+                        true,
+                        getString(R.string.record_direction),
+                        new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
-                            public void onPermissionGranted() {
+                            public void onPermissionsGranted(int requestCode, String[] permissions, String[] permissionNames) {
                                 onPermissionGranted[0] = true;
                             }
 
                             @Override
-                            public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                            public void onPermissionsDenied(int requestCode, String[] deniedPermissions, String[] deniedPermissionNames) {
                                 showToast(getResources().getString(R.string.audio_denied));
                                 onPermissionGranted[0] = false;
                             }
-                        });
-                if (onPermissionGranted[0]){
+                        },
+                        Manifest.permission.RECORD_AUDIO);
+
+                if (onPermissionGranted[0]) {
                     changVis(false, false, false, false);
                     audioStart();
                     mic.start();
@@ -245,7 +247,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
     public void stop() {
         try {
             audioStop();
-            if (TextUtils.isEmpty(audioText)){
+            if (TextUtils.isEmpty(audioText)) {
                 mASRText.setText("");
             }
             if (TextUtils.isEmpty(mASRText.getText())) {
@@ -365,16 +367,6 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
             send.setVisibility(View.VISIBLE);
         } else {
             send.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,  String[] permissions,  int[] grantResults) {
-        try {
-            XPermissionUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

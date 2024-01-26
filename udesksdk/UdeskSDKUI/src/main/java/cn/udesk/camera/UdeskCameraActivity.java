@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import cn.udesk.R;
 import cn.udesk.UdeskUtil;
@@ -19,7 +20,7 @@ import cn.udesk.camera.callback.ErrorListener;
 import cn.udesk.camera.callback.PermissionListener;
 import cn.udesk.camera.callback.UdeskCameraListener;
 import cn.udesk.permission.RequestCode;
-import cn.udesk.permission.XPermissionUtils;
+import cn.udesk.permission.run_permission_helper.RunPermissionHelper;
 import udesk.core.UdeskConst;
 
 /**
@@ -96,24 +97,28 @@ public class UdeskCameraActivity extends Activity {
                 public boolean onCheckAudioPermission() {
                     if (Build.VERSION.SDK_INT < 23) {
                         return true;
-                    }else {
+                    } else {
                         final boolean[] onPermissionGranted = {false};
-                        XPermissionUtils.requestPermissions(UdeskCameraActivity.this, RequestCode.AUDIO,
-                                new String[]{Manifest.permission.RECORD_AUDIO},
-                                new XPermissionUtils.OnPermissionListener() {
+                        RunPermissionHelper.INSTANCE.requestRunPermission(UdeskCameraActivity.this,
+                                false,
+                                true,
+                                getString(R.string.record_direction),
+                                new RunPermissionHelper.OnRequestPermissionsListener() {
                                     @Override
-                                    public void onPermissionGranted() {
+                                    public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
+
                                         onPermissionGranted[0] = true;
                                     }
 
                                     @Override
-                                    public void onPermissionDenied(String[] deniedPermissions, boolean alwaysDenied) {
+                                    public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
                                         Toast.makeText(getApplicationContext(),
                                                 getResources().getString(R.string.aduido_denied),
                                                 Toast.LENGTH_SHORT).show();
                                         onPermissionGranted[0] = false;
                                     }
-                                });
+                                },
+                                Manifest.permission.RECORD_AUDIO);
                         return onPermissionGranted[0];
                     }
                 }
@@ -172,16 +177,6 @@ public class UdeskCameraActivity extends Activity {
             e.printStackTrace();
         }
         super.onDestroy();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        try {
-            XPermissionUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 }

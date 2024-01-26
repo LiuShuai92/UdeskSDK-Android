@@ -54,3 +54,7 @@ dependencies {
     implementation 'cn.jiguang.sdk:jpush:3.5.0'
     implementation 'cn.jiguang.sdk:jcore:2.2.4'
 }
+
+configurations.implementation {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+}

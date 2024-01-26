@@ -435,7 +435,7 @@ object RunPermissionHelper {
             originalPermissions = permissions
             this.direction = direction
             val decorView = activity.window.decorView as ViewGroup
-            val rootView = LayoutInflater.from(activity).inflate(R.layout.fragment_permission, null)
+            val rootView = LayoutInflater.from(activity).inflate(R.layout.udesk_fragment_permission, null)
             handler.postDelayed({
                 decorView.addView(rootView)
             }, 300)

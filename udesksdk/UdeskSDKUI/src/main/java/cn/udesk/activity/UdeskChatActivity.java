@@ -1570,7 +1570,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             if (Build.VERSION.SDK_INT < 23) {
                 takePhoto();
             } else {
-                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
+                RunPermissionHelper.INSTANCE.requestRunPermission(this,
                         false,
                         true,
                         getString(R.string.camera_direction),
@@ -1778,10 +1778,10 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                     isNeedOpenLocalCamera = bundle.getBoolean(UdeskConst.Camera_Error);
 
                     String type = bundle.getString(UdeskConst.SEND_SMALL_VIDEO);
-                    if (type.equals(UdeskConst.SMALL_VIDEO)) {
+                    if (UdeskConst.SMALL_VIDEO.equals(type)) {
                         String path = bundle.getString(UdeskConst.PREVIEW_Video_Path);
                         udeskViewMode.sendFileMessage(this.getApplicationContext(), path, UdeskConst.ChatMsgTypeString.TYPE_SHORT_VIDEO);
-                    } else if (type.equals(UdeskConst.PICTURE)) {
+                    } else if (UdeskConst.PICTURE.equals(type)) {
                         String path = bundle.getString(UdeskConst.BitMapData);
                         udeskViewMode.sendFileMessage(this.getApplicationContext(), path, UdeskConst.ChatMsgTypeString.TYPE_IMAGE);
                     }

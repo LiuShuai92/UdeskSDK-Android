@@ -9,7 +9,7 @@
         <!--<attr name="titleBarBackground" format="reference|color"/>-->
     <!--</declare-styleable>-->
 
-    <declare-styleable name="RoundLayout">
+    <declare-styleable name="RoundContainerLayout">
         <attr name="radius" format="dimension" />
         <attr name="topLeftRadius" format="dimension" />
         <attr name="topRightRadius" format="dimension" />

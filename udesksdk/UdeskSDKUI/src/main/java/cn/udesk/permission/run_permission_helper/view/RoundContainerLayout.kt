@@ -9,7 +9,7 @@ import cn.udesk.R
 /**
  * Created by liush on 2018/1/15.
  */
-class RoundLayout @JvmOverloads constructor(
+class RoundContainerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
@@ -23,12 +23,12 @@ class RoundLayout @JvmOverloads constructor(
 
     init {
         if (attrs != null) {
-            val ta = context.obtainStyledAttributes(attrs, R.styleable.RoundLayout)
-            val radius = ta.getDimension(R.styleable.RoundLayout_radius, 0f)
-            topLeftRadius = ta.getDimension(R.styleable.RoundLayout_topLeftRadius, radius)
-            topRightRadius = ta.getDimension(R.styleable.RoundLayout_topRightRadius, radius)
-            bottomLeftRadius = ta.getDimension(R.styleable.RoundLayout_bottomLeftRadius, radius)
-            bottomRightRadius = ta.getDimension(R.styleable.RoundLayout_bottomRightRadius, radius)
+            val ta = context.obtainStyledAttributes(attrs, R.styleable.RoundContainerLayout)
+            val radius = ta.getDimension(R.styleable.RoundContainerLayout_radius, 0f)
+            topLeftRadius = ta.getDimension(R.styleable.RoundContainerLayout_topLeftRadius, radius)
+            topRightRadius = ta.getDimension(R.styleable.RoundContainerLayout_topRightRadius, radius)
+            bottomLeftRadius = ta.getDimension(R.styleable.RoundContainerLayout_bottomLeftRadius, radius)
+            bottomRightRadius = ta.getDimension(R.styleable.RoundContainerLayout_bottomRightRadius, radius)
             ta.recycle()
         }
         roundPaint = Paint()

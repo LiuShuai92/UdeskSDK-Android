@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     >
 
-    <cn.udesk.permission.run_permission_helper.view.RoundLayout
+    <cn.udesk.permission.run_permission_helper.view.RoundContainerLayout
         android:id="@+id/rl_direction"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -61,6 +61,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-    </cn.udesk.permission.run_permission_helper.view.RoundLayout>
+    </cn.udesk.permission.run_permission_helper.view.RoundContainerLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

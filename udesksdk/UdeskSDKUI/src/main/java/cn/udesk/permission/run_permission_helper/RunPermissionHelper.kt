@@ -26,7 +26,7 @@ import android.widget.TextView
 import android.widget.Toast
 import cn.udesk.R
 import cn.udesk.permission.run_permission_helper.LifecycleFragment.Companion.attach
-import cn.udesk.permission.run_permission_helper.view.RoundLayout
+import cn.udesk.permission.run_permission_helper.view.RoundContainerLayout
 import java.util.Arrays
 import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicInteger
@@ -354,7 +354,7 @@ object RunPermissionHelper {
     class PermissionFragment : Fragment() {
         private var mListener: OnRequestPermissionsListener? = null
         private val SETTING_RESULT_CODE = 1000
-        private var rlDirection: RoundLayout? = null
+        private var rlDirection: RoundContainerLayout? = null
         private var isOnRequestRunPermission = false
         private lateinit var originalPermissions: Array<String>
         private var direction: String? = null

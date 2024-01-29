@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 group='com.github.udesk'
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 33

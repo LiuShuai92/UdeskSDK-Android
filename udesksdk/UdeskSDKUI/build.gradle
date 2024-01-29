@@ -6,9 +6,8 @@ group = 'com.github.udesk'
 repositories {
     maven { url 'https://oss.jfrog.org/libs-snapshot' }
     maven { url 'https://jitpack.io' }
-    jcenter()
-    google()
     mavenCentral()
+    google()
 }
 
 android {

@@ -101,6 +101,8 @@ import static cn.udesk.emotion.LQREmotionKit.getContext;
 
 public class UdeskUtil {
 
+    private static String TAG = "UdeskUtil";
+
     /**
      * 检查网络是否是连接
      */
@@ -189,7 +191,7 @@ public class UdeskUtil {
         }
         String path = "";
         try {
-            if (cameraFile != null){
+            if (cameraFile != null) {
                 return cameraFile.getAbsolutePath();
             }
             return getFilePath(context, uri);
@@ -362,12 +364,12 @@ public class UdeskUtil {
             String filename = "";
             try {
                 if (type.equals(UdeskConst.FileImg) && (filePath.startsWith("http") || filePath.startsWith("https"))) {
-                    filename = urlMd5(filePath)+ UdeskConst.IMG_SUF;
+                    filename = urlMd5(filePath) + UdeskConst.IMG_SUF;
                 }
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-            if (TextUtils.isEmpty(filename)){
+            if (TextUtils.isEmpty(filename)) {
                 filename = getFileName(context, filePath);
             }
             if (filePath.startsWith("http") || filePath.startsWith("https")) {
@@ -879,11 +881,11 @@ public class UdeskUtil {
                             return ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, Long.valueOf(split[1])).toString();
                         } else if ("audio".equals(type)) {
                             return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, Long.valueOf(split[1])).toString();
-                        }else {
+                        } else {
                             return getCopyFilePath(context, uri);
                         }
                     }
-                    if ("image".equals(type) || "video".equals(type) || "audio".equals(type)){
+                    if ("image".equals(type) || "video".equals(type) || "audio".equals(type)) {
                         Uri contentUri = null;
                         if ("image".equals(type)) {
                             contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -895,12 +897,12 @@ public class UdeskUtil {
                         final String selection = "_id=?";
                         final String[] selectionArgs = new String[]{split[1]};
                         String path = getDataColumn(context, contentUri, selection, selectionArgs);
-                        if (TextUtils.isEmpty(path)){
+                        if (TextUtils.isEmpty(path)) {
                             return getCopyFilePath(context, uri);
-                        }else {
+                        } else {
                             return path;
                         }
-                    }else {
+                    } else {
                         return getCopyFilePath(context, uri);
                     }
                 } else {
@@ -1041,10 +1043,10 @@ public class UdeskUtil {
                 final int column_index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(column_index);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }finally {
+        } finally {
             if (cursor != null) {
                 cursor.close();
             }
@@ -1306,6 +1308,34 @@ public class UdeskUtil {
             e.printStackTrace();
         }
         return blockSize;
+    }
+
+    public static long getFileSizeQ(Context context, Uri uri) {
+        long fileSize = 0;
+        Cursor cursor = null;
+        Log.e(TAG, "[getFileSizeQ] 获取文件大小: uri = " + uri.getPath());
+        try {
+            // 使用 ContentResolver 查询 URI 的元数据
+            cursor = context.getContentResolver().query(uri, null, null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                // 获取文件大小列的索引
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+
+                // 确保索引有效且值不为空
+                if (sizeIndex != -1 && !cursor.isNull(sizeIndex)) {
+                    fileSize = cursor.getLong(sizeIndex);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "[getFileSizeQ] 获取文件大小失败", e);
+        } finally {
+            if (cursor != null) {
+                // 别忘了关闭 Cursor
+                cursor.close();
+            }
+        }
+        return fileSize;
     }
 
     public static long getFileSize(File file) {
@@ -1585,6 +1615,7 @@ public class UdeskUtil {
                 UdeskConst.SendFlag.RESULT_SUCCESS, UdeskConst.PlayFlag.NOPLAY, UdeskConst.ChatMsgDirection.Recv, "", 0, "", "", "",
                 0, "");
     }
+
     public static MessageInfo buildSurveyMsg(String content) {
         return buildMsg("", "", System.currentTimeMillis(), UdeskIdBuild.buildMsgId(), UdeskConst.ChatMsgTypeString.TYPE_SURVEY, content, UdeskConst.ChatMsgReadFlag.read,
                 UdeskConst.SendFlag.RESULT_SUCCESS, UdeskConst.PlayFlag.NOPLAY, UdeskConst.ChatMsgDirection.Recv, "", 0, "", "", "",
@@ -1623,6 +1654,7 @@ public class UdeskUtil {
         return messageInfo;
 
     }
+
     public static MessageInfo buildSwitchStaffAnswerReply(RobotInit robotInit) {
         MessageInfo messageInfo = buildMsg(robotInit.getWebConfig().getRobotName(), robotInit.getWebConfig().getLogoUrl(), System.currentTimeMillis(), UdeskIdBuild.buildMsgId(), UdeskConst.ChatMsgTypeString.TYPE_RICH,
                 robotInit.getSwitchStaffAnswer(), UdeskConst.ChatMsgReadFlag.read, UdeskConst.SendFlag.RESULT_SUCCESS, UdeskConst.PlayFlag.NOPLAY, UdeskConst.ChatMsgDirection.Recv,
@@ -1632,7 +1664,7 @@ public class UdeskUtil {
 
     }
 
-    public static ArrayList<MessageInfo> buildAllMessage(Context context,LogBean message) {
+    public static ArrayList<MessageInfo> buildAllMessage(Context context, LogBean message) {
         if (message.getContent() != null) {
             Content content = message.getContent();
             if (content.getData() != null) {
@@ -1642,8 +1674,8 @@ public class UdeskUtil {
                 // FAQ推荐转人工 关闭的时候，触发器转人工开启  switchStaffType有值
                 // 自动转人工  2 推荐转人工-带消息 4  推荐转人工-不带消息 1  发送消息 3
 
-                if (!TextUtils.isEmpty(content.getData().getContent()) || content.getData().getTopAsk()!= null
-                        || (!TextUtils.isEmpty(content.getData().getFlowContent()) && content.getData().getFlowId() > 0 ) ){
+                if (!TextUtils.isEmpty(content.getData().getContent()) || content.getData().getTopAsk() != null
+                        || (!TextUtils.isEmpty(content.getData().getFlowContent()) && content.getData().getFlowId() > 0)) {
                     MessageInfo info = buildMsg(message.getAgent_nick_name(), message.getAgent_avatar(), stringToLong(message.getCreated_at()),
                             UdeskUtils.objectToString(message.getMessage_id()), message.getContent().getType(), content.getData().getContent(),
                             UdeskConst.ChatMsgReadFlag.read, UdeskConst.SendFlag.RESULT_SUCCESS, UdeskConst.PlayFlag.NOPLAY, UdeskConst.ChatMsgDirection.Recv,
@@ -1667,9 +1699,9 @@ public class UdeskUtil {
                     if (message.getSender().equals(UdeskConst.Sender.customer)) {
                         info.setDirection(UdeskConst.ChatMsgDirection.Send);
                     }
-                    if (content.getData().getSwitchStaffType() == 1){
+                    if (content.getData().getSwitchStaffType() == 1) {
                         info.setDealTransfer(!TextUtils.isEmpty(content.getData().getContent()) && TextUtils.isEmpty(content.getData().getSwitchStaffAnswer()));
-                    }else if (content.getData().getSwitchStaffType() > 1){
+                    } else if (content.getData().getSwitchStaffType() > 1) {
                         info.setDealTransfer(false);
                     }
                     messageInfos.add(info);
@@ -1685,7 +1717,7 @@ public class UdeskUtil {
                             content.getData().getSwitchStaffType(), "");
                     info.setLogId(message.getLogId());
                     messageInfos.add(info);
-                }else if (content.getData().getSwitchStaffType() == UdeskConst.SwitchStaffType.RECOMMEND_SEND_MESSAGE){
+                } else if (content.getData().getSwitchStaffType() == UdeskConst.SwitchStaffType.RECOMMEND_SEND_MESSAGE) {
                     MessageInfo info = buildMsg(message.getAgent_nick_name(), message.getAgent_avatar(), stringToLong(message.getCreated_at()),
                             UdeskIdBuild.buildMsgId(), UdeskConst.ChatMsgTypeString.TYPE_RICH, content.getData().getSwitchStaffAnswer(),
                             UdeskConst.ChatMsgReadFlag.read, UdeskConst.SendFlag.RESULT_SUCCESS, UdeskConst.PlayFlag.NOPLAY, UdeskConst.ChatMsgDirection.Recv,
@@ -1693,9 +1725,9 @@ public class UdeskUtil {
                             content.getData().getSwitchStaffType(), content.getData().getSwitchStaffTips());
                     info.setLogId(message.getLogId());
                     messageInfos.add(info);
-                }else if (content.getData().getSwitchStaffType() == UdeskConst.SwitchStaffType.RECOMMEND){
+                } else if (content.getData().getSwitchStaffType() == UdeskConst.SwitchStaffType.RECOMMEND) {
                     try {
-                        if(!TextUtils.isEmpty(content.getData().getContent()) && TextUtils.isEmpty(content.getData().getSwitchStaffAnswer()) ){
+                        if (!TextUtils.isEmpty(content.getData().getContent()) && TextUtils.isEmpty(content.getData().getSwitchStaffAnswer())) {
                             return messageInfos;
                         }
                         MessageInfo info = buildMsg(message.getAgent_nick_name(), message.getAgent_avatar(), stringToLong(message.getCreated_at()),
@@ -1708,8 +1740,8 @@ public class UdeskUtil {
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
-                }else if (content.getData().getSwitchStaffType() == UdeskConst.SwitchStaffType.SEND_MESSAGE
-                        && !TextUtils.isEmpty(content.getData().getSwitchStaffAnswer())){
+                } else if (content.getData().getSwitchStaffType() == UdeskConst.SwitchStaffType.SEND_MESSAGE
+                        && !TextUtils.isEmpty(content.getData().getSwitchStaffAnswer())) {
                     MessageInfo info = buildMsg(message.getAgent_nick_name(), message.getAgent_avatar(), stringToLong(message.getCreated_at()),
                             UdeskIdBuild.buildMsgId(), UdeskConst.ChatMsgTypeString.TYPE_RICH, content.getData().getSwitchStaffAnswer(),
                             UdeskConst.ChatMsgReadFlag.read, UdeskConst.SendFlag.RESULT_SUCCESS, UdeskConst.PlayFlag.NOPLAY, UdeskConst.ChatMsgDirection.Recv,
@@ -1837,21 +1869,22 @@ public class UdeskUtil {
 
     public static Object connectVideoWebSocket(Context context) {
         try {
-            if (isClassExists("udesk.udeskvideo.UdeskVideoActivity") && !TextUtils.isEmpty(UdeskConst.signToenUrl)){
+            if (isClassExists("udesk.udeskvideo.UdeskVideoActivity") && !TextUtils.isEmpty(UdeskConst.signToenUrl)) {
                 Class c = Class.forName("udesk.udeskvideo.ReflectManager");
                 Constructor declaredConstructor = c.getDeclaredConstructor();
                 declaredConstructor.setAccessible(true);
                 Object o = declaredConstructor.newInstance();
-                Method declaredMethod = c.getDeclaredMethod("OnConnectWebsocket",Context.class);
+                Method declaredMethod = c.getDeclaredMethod("OnConnectWebsocket", Context.class);
                 declaredMethod.setAccessible(true);
-                declaredMethod.invoke(o,context);
+                declaredMethod.invoke(o, context);
                 return o;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
+
     /**
      * 原图
      *
@@ -2079,13 +2112,13 @@ public class UdeskUtil {
         return msgInfos;
     }
 
-    public static int[] getImageWidthHeight(Context context,int[] rect,int width){
+    public static int[] getImageWidthHeight(Context context, int[] rect, int width) {
         try {
             int sampleSize = 1;
             int originWidth = rect[0];
             int originHeight = rect[1];
-            int maxHeight = UdeskUtils.getScreenHeight(context)/2;
-            if (width> 0){
+            int maxHeight = UdeskUtils.getScreenHeight(context) / 2;
+            if (width > 0) {
                 if (originWidth > width) {
                     sampleSize = (int) (rect[0] / width);
                 }
@@ -2101,7 +2134,7 @@ public class UdeskUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new int[]{0,0};
+        return new int[]{0, 0};
     }
 
     /**
@@ -2141,7 +2174,8 @@ public class UdeskUtil {
         bitmap = BitmapFactory.decodeStream(byteArrayInputStream, null, options);
         return bitmap;
     }
-    public static Bitmap compressRatio(Context context,String url, int width) {
+
+    public static Bitmap compressRatio(Context context, String url, int width) {
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -2153,8 +2187,8 @@ public class UdeskUtil {
             int sampleSize = 1;
 
 
-            int maxHeight = UdeskUtils.getScreenHeight(context)/2;
-            if (width> 0){
+            int maxHeight = UdeskUtils.getScreenHeight(context) / 2;
+            if (width > 0) {
                 if (originWidth > width) {
                     sampleSize = (int) (originWidth / width);
                 }

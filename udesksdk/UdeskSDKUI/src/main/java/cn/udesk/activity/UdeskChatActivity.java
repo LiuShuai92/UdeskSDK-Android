@@ -1866,12 +1866,12 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 Uri mImageCaptureUri = data.getData();
                 if (mImageCaptureUri != null) {
                     try {
-                        String path = UdeskUtil.getFilePath(getApplicationContext(), mImageCaptureUri);
+//                        String path = UdeskUtil.getFilePath(getApplicationContext(), mImageCaptureUri);
                         if (this.getWindow() != null && this.getWindow().getDecorView().getWindowToken() != null && UdeskUtil.isGpsNet(getApplicationContext())) {
-                            toGpsNetView(true, null, path);
+                            toGpsNetView(true, null, mImageCaptureUri);
                             return;
                         }
-                        sendFile(path);
+                        sendFile(mImageCaptureUri);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1917,9 +1917,11 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
 
     }
 
-    private void sendFile(String path) {
+    private void sendFile(Uri uri) {
+        String path = uri.getPath();
         try {
-            long size = UdeskUtil.getFileSizeQ(getApplicationContext(), path);
+            Log.d(TAG, "sendFile: path = " + path);
+            long size = UdeskUtil.getFileSizeQ(this, uri);
             if (size >= 30 * 1000 * 1000) {
                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.udesk_file_to_large));
                 return;
@@ -1934,7 +1936,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             }
         } catch (Exception e) {
 //            e.printStackTrace();
-            Log.e(TAG, "sendFile: path = " + path + ",\n error = " + e.getMessage() + ", \n" + e);
+            Log.e(TAG, "sendFile: uri = " + path + ",\n error = " + e.getMessage() + ", \n" + e);
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
         }
@@ -2113,17 +2115,67 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
     //启动手机默认的选择mp4文件
     private void selectFile() {
         try {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("*/*");
-            Intent wrapperIntent = Intent.createChooser(intent, null);
-            startActivityForResult(wrapperIntent, SELECT_FILE_OPTION_REQUEST_CODE);
+//            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//            intent.addCategory(Intent.CATEGORY_OPENABLE);
+//            intent.setType("*/*");
+//            Intent wrapperIntent = Intent.createChooser(intent, null);
+//            startActivityForResult(wrapperIntent, SELECT_FILE_OPTION_REQUEST_CODE);
+            openSystemFilePicker(3, SELECT_FILE_OPTION_REQUEST_CODE);
         } catch (Exception e) {
 //            e.printStackTrace();
             Log.e(TAG, "takePhoto: error = " + e.getMessage() + ", \n" + e);
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
         }
+    }
+
+    /**
+     * 打开系统文件选择器
+     * @param fileType 0=图片, 1=视频, 2=音频, 3=其他文件
+     */
+    private void openSystemFilePicker(int fileType, int requestCode) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        // 关键点1：必须添加 CATEGORY_OPENABLE，确保返回的 URI 是可以被 ContentResolver 打开读取流的
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        String mimeType = "*/*"; // 默认所有文件
+
+        switch (fileType) {
+            case 0: // 图片
+                mimeType = "image/*";
+                break;
+            case 1: // 视频
+                mimeType = "video/*";
+                break;
+            case 2: // 音频
+                mimeType = "audio/*";
+                break;
+            case 3: // 文档/其他文件
+                // 如果你想让用户选择所有类型的文件，使用 "*/*"
+                mimeType = "*/*";
+                break;
+        }
+
+        intent.setType(mimeType);
+
+        // 关键点2：针对“文档”类型，如果你想过滤掉图片/视频，只显示 PDF/Word 等
+        // 或者你想精确指定支持的文件类型，可以使用 EXTRA_MIME_TYPES
+        if (fileType == 3) {
+            String[] mimeTypes = {
+                    "application/pdf",              // PDF
+                    "application/msword",           // Word (doc)
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word (docx)
+                    "application/vnd.ms-excel",     // Excel (xls)
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel (xlsx)
+                    "text/plain",                   // TXT
+                    "application/zip"               // ZIP
+            };
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        }
+
+        // 启动选择器
+        // 注意：建议所有类型共用一个 REQUEST_CODE，或者根据 type 分发不同的 code
+        startActivityForResult(intent, requestCode);
     }
 
 
@@ -2252,9 +2304,9 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
      *
      * @param isupload
      * @param info
-     * @param path
+     * @param uri
      */
-    private void toGpsNetView(final boolean isupload, final MessageInfo info, final String path) {
+    private void toGpsNetView(final boolean isupload, final MessageInfo info, final Uri uri) {
         try {
             String positiveLabel = this.getString(R.string.udesk_sure);
             String negativeLabel = this.getString(R.string.udesk_cancel);
@@ -2275,8 +2327,8 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                             @Override
                             public void onPositiveClick() {
                                 try {
-                                    if (isupload && !TextUtils.isEmpty(path)) {
-                                        sendFile(path);
+                                    if (isupload && !TextUtils.isEmpty(uri.getPath())) {
+                                        sendFile(uri);
                                     }
                                     if (!isupload && info != null) {
                                         udeskViewMode.getFileLiveData().downFile(info, getApplicationContext());

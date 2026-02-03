@@ -3,11 +3,12 @@ apply plugin: 'com.android.library'
 group='com.github.udesk'
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 33
+        minSdkVersion 21
+        namespace 'udesk.udeskvideo'
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -25,6 +26,11 @@ android {
         main {
             jniLibs.srcDirs = ['src/main/libs']
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 

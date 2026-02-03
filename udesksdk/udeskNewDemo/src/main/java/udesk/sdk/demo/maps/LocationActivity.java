@@ -162,35 +162,31 @@ public class LocationActivity extends Activity implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fl_back:  //返回
-                finish();
-                break;
-            case R.id.fl_search:  //查找
-                Intent search_intent = new Intent(LocationActivity.this, SearchPositionActivity.class);
-                startActivityForResult(search_intent, REQUEST_CODE);
-                break;
-            case R.id.tv_send:  //发送
-                if (mPoiItem == null) {
-                    Toast.makeText(getApplicationContext(), "请选择详细地址", Toast.LENGTH_SHORT).show();
-                    return;
+        int id = v.getId();
+        if (id == R.id.fl_back) {  //返回
+            finish();
+        } else if (id == R.id.fl_search) {  //查找
+            Intent search_intent = new Intent(LocationActivity.this, SearchPositionActivity.class);
+            startActivityForResult(search_intent, REQUEST_CODE);
+        } else if (id == R.id.tv_send) {  //发送
+            if (mPoiItem == null) {
+                Toast.makeText(getApplicationContext(), "请选择详细地址", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            mMap.getMapScreenShot(new AMap.OnMapScreenShotListener() {
+                @Override
+                public void onMapScreenShot(Bitmap bitmap) {
+                    saveBitmap(bitmap);
+                    Intent intent = new Intent();
+                    intent.putExtra(UdeskConfig.UdeskMapIntentName.Position, mPoiItem.getTitle());
+                    intent.putExtra(UdeskConfig.UdeskMapIntentName.Latitude, mPoiItem.getLatLonPoint().getLatitude());
+                    intent.putExtra(UdeskConfig.UdeskMapIntentName.Longitude, mPoiItem.getLatLonPoint().getLongitude());
+                    intent.putExtra(UdeskConfig.UdeskMapIntentName.BitmapDIR, bitmapdir);
+                    setResult(RESULT_OK, intent);
+                    finish();
                 }
-
-                mMap.getMapScreenShot(new AMap.OnMapScreenShotListener() {
-                    @Override
-                    public void onMapScreenShot(Bitmap bitmap) {
-                        saveBitmap(bitmap);
-                        Intent intent = new Intent();
-                        intent.putExtra(UdeskConfig.UdeskMapIntentName.Position, mPoiItem.getTitle());
-                        intent.putExtra(UdeskConfig.UdeskMapIntentName.Latitude, mPoiItem.getLatLonPoint().getLatitude());
-                        intent.putExtra(UdeskConfig.UdeskMapIntentName.Longitude, mPoiItem.getLatLonPoint().getLongitude());
-                        intent.putExtra(UdeskConfig.UdeskMapIntentName.BitmapDIR, bitmapdir);
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    }
-                });
-
-                break;
+            });
         }
     }
 

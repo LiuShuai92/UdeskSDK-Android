@@ -137,7 +137,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
      */
     private void setWaveCircleView() {
         try {
-            mic.setColor(getResources().getColor(R.color.udesk_color_307AE8));
+            mic.setColor(getResources().getColor(cn.udesk.R.color.udesk_color_307AE8));
             mic.setDuration(1000);
             mic.setWaveCreatedSpeed(500);
             mic.setmCenterBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.udesk_mic));
@@ -188,7 +188,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
                 String text = data.getStringExtra(UdeskConstant.UDESK_EDIT_TEXT);
                 if (!TextUtils.isEmpty(text)) {
                     mASRText.setText(text);
-                    mASRText.setTextColor(getResources().getColor(R.color.udesk_color_212121));
+                    mASRText.setTextColor(getResources().getColor(cn.udesk.R.color.udesk_color_212121));
                 }
             }
         } catch (Exception e) {
@@ -211,7 +211,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
                 RunPermissionHelper.INSTANCE.requestRunPermission(UdeskASRActivity.this,
                         false,
                         true,
-                        getString(R.string.record_direction),
+                        getString(cn.udesk.R.string.record_direction),
                         new RunPermissionHelper.OnRequestPermissionsListener() {
                             @Override
                             public void onPermissionsGranted(int requestCode, String[] permissions, String[] permissionNames) {
@@ -220,7 +220,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
 
                             @Override
                             public void onPermissionsDenied(int requestCode, String[] deniedPermissions, String[] deniedPermissionNames) {
-                                showToast(getResources().getString(R.string.audio_denied));
+                                showToast(getResources().getString(cn.udesk.R.string.audio_denied));
                                 onPermissionGranted[0] = false;
                             }
                         },
@@ -235,7 +235,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showToast(getString(R.string.udesk_asr_fail));
+            showToast(getString(cn.udesk.R.string.udesk_asr_fail));
             changVis(true, true, false, false);
         }
     }
@@ -257,7 +257,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showToast(getString(R.string.udesk_asr_fail));
+            showToast(getString(cn.udesk.R.string.udesk_asr_fail));
             changVis(true, true, false, false);
         }
     }
@@ -266,8 +266,8 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
      * 语音识别开始
      */
     private void audioStart() {
-        mASRText.setText(getString(R.string.udesk_please_talk));
-        mASRText.setTextColor(getResources().getColor(R.color.udesk_color_66212121));
+        mASRText.setText(getString(cn.udesk.R.string.udesk_please_talk));
+        mASRText.setTextColor(getResources().getColor(cn.udesk.R.color.udesk_color_66212121));
         audioText = new StringBuffer();
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         String event = null;
@@ -332,7 +332,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
                         audioText.append(result);
                     }
                     mASRText.setText(audioText.toString());
-                    mASRText.setTextColor(getResources().getColor(R.color.udesk_color_212121));
+                    mASRText.setTextColor(getResources().getColor(cn.udesk.R.color.udesk_color_212121));
                     if (TextUtils.isEmpty(mASRText.getText())) {
                         changVis(true, true, false, false);
                     } else {
@@ -342,7 +342,7 @@ public class UdeskASRActivity extends Activity implements EventListener, View.On
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showToast(getString(R.string.udesk_asr_fail));
+            showToast(getString(cn.udesk.R.string.udesk_asr_fail));
             changVis(true, true, false, false);
         }
     }

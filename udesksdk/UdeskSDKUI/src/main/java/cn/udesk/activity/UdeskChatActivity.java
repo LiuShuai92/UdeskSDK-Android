@@ -122,6 +122,7 @@ import udesk.core.utils.UdeskUtils;
 
 
 public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSelectedListener {
+    static final String TAG = "UdeskChatActivity";
     public LinearLayout mContentLinearLayout;//消息内容区域
     public UDPullGetMoreListView mListView;
     private MessageAdatper mChatAdapter;
@@ -1637,7 +1638,11 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             } else {
                 String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                 if (Build.VERSION.SDK_INT >= 33) {
-                    permissions = new String[]{Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
+                    permissions = new String[]{
+                            Manifest.permission.READ_MEDIA_AUDIO,
+                            Manifest.permission.READ_MEDIA_IMAGES,
+                            Manifest.permission.READ_MEDIA_VIDEO,
+                            Manifest.permission.READ_EXTERNAL_STORAGE};
                 }
 
                 RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
@@ -1928,7 +1933,8 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 udeskViewMode.sendFileMessage(this.getApplicationContext(), path, UdeskConst.ChatMsgTypeString.TYPE_FILE);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            Log.e(TAG, "sendFile: path = " + path + ",\n error = " + e.getMessage() + ", \n" + e);
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
         }
@@ -2067,7 +2073,8 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 startActivityForResult(intent, SELECT_UDESK_IMAGE_ACTIVITY_REQUEST_CODE);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "selectPhoto: error = " + e.getMessage() + ", \n" + e);
+//            e.printStackTrace();
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
         }
@@ -2096,7 +2103,8 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "takePhoto: error = " + e.getMessage() + ", \n" + e);
+//            e.printStackTrace();
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
         }
@@ -2111,7 +2119,8 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
             Intent wrapperIntent = Intent.createChooser(intent, null);
             startActivityForResult(wrapperIntent, SELECT_FILE_OPTION_REQUEST_CODE);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            Log.e(TAG, "takePhoto: error = " + e.getMessage() + ", \n" + e);
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
         }

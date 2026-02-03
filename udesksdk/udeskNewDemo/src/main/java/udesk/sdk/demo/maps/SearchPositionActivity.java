@@ -101,22 +101,20 @@ public class SearchPositionActivity extends Activity implements AdapterView.OnIt
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fl_search_back:
-                finish();
-                break;
-            case R.id.tv_search_send:
-                if (!TextUtils.isEmpty(et_search.getText().toString())) {
-                    pb_location_search_load_bar.setVisibility(View.VISIBLE);
-                    // 根据输入框的内容，进行搜索
+        final int viewId = view.getId();
+        if (viewId == R.id.fl_search_back) {
+            finish();
+        } else if (viewId == R.id.tv_search_send) {
+            if (!TextUtils.isEmpty(et_search.getText().toString())) {
+                pb_location_search_load_bar.setVisibility(View.VISIBLE);
+                // 根据输入框的内容，进行搜索
 //                    mSuggestionSearch.requestSuggestion(new SuggestionSearchOption().keyword(et_search.getText().toString()).city(""));
-                    mKeyWord = et_search.getText().toString();
-                    datas.clear();
-                    doSearchQuery(mKeyWord);
-                } else {
-                    Toast.makeText(getApplicationContext(), "请输入地点", Toast.LENGTH_LONG).show();
-                }
-                break;
+                mKeyWord = et_search.getText().toString();
+                datas.clear();
+                doSearchQuery(mKeyWord);
+            } else {
+                Toast.makeText(getApplicationContext(), "请输入地点", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

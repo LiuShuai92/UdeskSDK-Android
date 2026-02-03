@@ -179,22 +179,22 @@ public class UdeskFuncationExampleActivity extends Activity implements CompoundB
         }
 
         UdeskConfig.Builder builder = new UdeskConfig.Builder();
-        builder.setUdeskTitlebarBgResId(R.color.udesk_titlebar_bg1) //设置标题栏TitleBar的背景色
-                .setUdeskTitlebarMiddleTextResId(R.color.udesk_color_middle_text) //设置标题栏TitleBar，左右两侧文字的颜色
-                .setUdeskTitlebarRightTextResId(R.color.udesk_color_right_text) //设置标题栏TitleBar，右侧文字的颜色
-                .setUdeskIMLeftTextColorResId(R.color.udesk_color_im_text_left1) //设置IM界面，左侧文字的字体颜色
-                .setUdeskIMRightTextColorResId(R.color.udesk_color_im_text_right1) // 设置IM界面，右侧文字的字体颜色
-                .setUdeskIMAgentNickNameColorResId(R.color.udesk_color_im_left_nickname1) //设置IM界面，左侧客服昵称文字的字体颜色
-                .setUdeskIMCustomerNickNameColorResId(R.color.udesk_color_im_right_nickname1) //设置IM界面，右侧用户昵称文字的字体颜色
-                .setUdeskIMTimeTextColorResId(R.color.udesk_color_im_time_text1) // 设置IM界面，时间文字的字体颜色
-                .setUdeskIMTipTextColorResId(R.color.udesk_color_im_tip_text1) //设置IM界面，提示语文字的字体颜色，比如客服转移
-                .setUdeskbackArrowIconResId(R.drawable.udesk_titlebar_back) // 设置返回箭头图标资源id
-                .setUdeskCommityBgResId(R.color.udesk_color_im_commondity_bg1) //咨询商品item的背景颜色
-                .setUdeskCommityTitleColorResId(R.color.udesk_color_im_commondity_title1) // 商品介绍Title的字样颜色
-                .setUdeskCommitysubtitleColorResId(R.color.udesk_color_im_commondity_subtitle1)// 商品咨询页面中，商品介绍子Title的字样颜色
-                .setUdeskCommityLinkColorResId(R.color.udesk_color_im_commondity_link1) //商品咨询页面中，发送链接的字样颜色
-                .setUdeskProductLeftBgResId(R.drawable.udesk_im_txt_left_default) //商品消息背景
-                .setUdeskProductRightBgResId(R.drawable.udesk_im_item_bg_right) //商品消息背景
+        builder.setUdeskTitlebarBgResId(cn.udesk.R.color.udesk_titlebar_bg1) //设置标题栏TitleBar的背景色
+                .setUdeskTitlebarMiddleTextResId(cn.udesk.R.color.udesk_color_middle_text) //设置标题栏TitleBar，左右两侧文字的颜色
+                .setUdeskTitlebarRightTextResId(cn.udesk.R.color.udesk_color_right_text) //设置标题栏TitleBar，右侧文字的颜色
+                .setUdeskIMLeftTextColorResId(cn.udesk.R.color.udesk_color_im_text_left1) //设置IM界面，左侧文字的字体颜色
+                .setUdeskIMRightTextColorResId(cn.udesk.R.color.udesk_color_im_text_right1) // 设置IM界面，右侧文字的字体颜色
+                .setUdeskIMAgentNickNameColorResId(cn.udesk.R.color.udesk_color_im_left_nickname1) //设置IM界面，左侧客服昵称文字的字体颜色
+                .setUdeskIMCustomerNickNameColorResId(cn.udesk.R.color.udesk_color_im_right_nickname1) //设置IM界面，右侧用户昵称文字的字体颜色
+                .setUdeskIMTimeTextColorResId(cn.udesk.R.color.udesk_color_im_time_text1) // 设置IM界面，时间文字的字体颜色
+                .setUdeskIMTipTextColorResId(cn.udesk.R.color.udesk_color_im_tip_text1) //设置IM界面，提示语文字的字体颜色，比如客服转移
+                .setUdeskbackArrowIconResId(cn.udesk.R.drawable.udesk_titlebar_back) // 设置返回箭头图标资源id
+                .setUdeskCommityBgResId(cn.udesk.R.color.udesk_color_im_commondity_bg1) //咨询商品item的背景颜色
+                .setUdeskCommityTitleColorResId(cn.udesk.R.color.udesk_color_im_commondity_title1) // 商品介绍Title的字样颜色
+                .setUdeskCommitysubtitleColorResId(cn.udesk.R.color.udesk_color_im_commondity_subtitle1)// 商品咨询页面中，商品介绍子Title的字样颜色
+                .setUdeskCommityLinkColorResId(cn.udesk.R.color.udesk_color_im_commondity_link1) //商品咨询页面中，发送链接的字样颜色
+                .setUdeskProductLeftBgResId(cn.udesk.R.drawable.udesk_im_txt_left_default) //商品消息背景
+                .setUdeskProductRightBgResId(cn.udesk.R.drawable.udesk_im_item_bg_right) //商品消息背景
                 .setUdeskProductMaxLines(2) //商品消息名称最大显示行数
                 .setUserSDkPush(set_sdkpush.isChecked()) // 配置 是否使用推送服务  true 表示使用  false表示不使用
                 .setOnlyUseRobot(set_use_onlyrobot.isChecked())//配置是否只使用机器人功能 只使用机器人功能,只使用机器人功能;  其它功能不使用。

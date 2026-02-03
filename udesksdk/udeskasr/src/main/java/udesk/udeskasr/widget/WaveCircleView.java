@@ -77,7 +77,7 @@ public class WaveCircleView extends View  {
     public WaveCircleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WaveCircleView, 0, defStyleAttr);
-        mWaveColor = typedArray.getColor(R.styleable.WaveCircleView_udesk_color,getResources().getColor(R.color.udesk_color_307AE8));
+        mWaveColor = typedArray.getColor(R.styleable.WaveCircleView_udesk_color,getResources().getColor(cn.udesk.R.color.udesk_color_307AE8));
         mCenterBitmap = BitmapFactory.decodeResource(getResources(), typedArray.getResourceId(R.styleable.WaveCircleView_udesk_image, R.drawable.udesk_mic));
         mWaveDuration = typedArray.getInteger(R.styleable.WaveCircleView_udesk_duration, 1000);
         mWaveCreatedSpeed = typedArray.getInteger(R.styleable.WaveCircleView_udesk_waveCreateSpeed, 500);

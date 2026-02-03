@@ -69,12 +69,8 @@ public class ShowSelectLocationActivity extends Activity implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-
-            case R.id.fl_back:  //返回
-                finish();
-                break;
-
+        if (v.getId() == R.id.fl_back) {  //返回
+            finish();
         }
     }
 

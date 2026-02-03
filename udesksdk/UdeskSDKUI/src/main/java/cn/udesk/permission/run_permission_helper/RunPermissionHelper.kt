@@ -549,7 +549,7 @@ object RunPermissionHelper {
                 deniedMsg.append("被拒绝，请在-应用设置-权限-中，允许应用使用该权限。")
                 val permissionDialog = AlertDialog.Builder(
                     activity,
-                    R.style.Theme_AppCompat_Dialog
+                    androidx.appcompat.R.style.Theme_AppCompat_Dialog
                 ) //                    .setTitle("缺少权限！")
                     .setMessage(deniedMsg)
                     .setPositiveButton("前往设置") { dialog: DialogInterface?, which: Int ->

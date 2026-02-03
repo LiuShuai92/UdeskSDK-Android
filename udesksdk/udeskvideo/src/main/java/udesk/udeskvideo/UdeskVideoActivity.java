@@ -159,7 +159,7 @@ public class UdeskVideoActivity extends Activity implements View.OnClickListener
             RunPermissionHelper.INSTANCE.requestRunPermission(this,
                     false,
                     true,
-                    getString(R.string.video_direction),
+                    getString(cn.udesk.R.string.video_direction),
                     new RunPermissionHelper.OnRequestPermissionsListener() {
                         @Override
                         public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {

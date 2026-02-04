@@ -2064,16 +2064,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
     //启动手机默认的选择照片
     private void selectPhoto() {
         try {
-            if (Build.VERSION.SDK_INT < 21) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                startActivityForResult(intent, SELECT_IMAGE_ACTIVITY_REQUEST_CODE);
-            } else {
-                Intent intent = new Intent();
-                intent.setClass(UdeskChatActivity.this, PhotoSelectorActivity.class);
-                startActivityForResult(intent, SELECT_UDESK_IMAGE_ACTIVITY_REQUEST_CODE);
-            }
+            openSystemFilePicker(0, SELECT_IMAGE_ACTIVITY_REQUEST_CODE);
         } catch (Exception e) {
             Log.e(TAG, "selectPhoto: error = " + e.getMessage() + ", \n" + e);
 //            e.printStackTrace();

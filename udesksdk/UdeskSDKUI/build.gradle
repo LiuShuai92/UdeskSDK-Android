@@ -35,7 +35,28 @@ android {
         jvmTarget = JavaVersion.VERSION_17
     }
 }
+// 添加发布配置
+afterEvaluate {
+    publishing {
+        publications {
+            // 创建一个名为 'release' 的发布任务
+            release(MavenPublication) {
+                // 从 release 组件创建发布内容
+                from components.release
 
+                // 这里的 groupId 建议遵循 JitPack 的多模块规范
+                // 格式：com.github.用户名.仓库名
+                groupId = 'com.github.LiuShuai92.UdeskSDK-Android'
+
+                // 这里的 artifactId 就是模块名
+                artifactId = 'UdeskSDKUI'
+
+                // 版本号通常跟随项目 git tag，这里可以动态获取或写死
+                version = 'v5.6.9'
+            }
+        }
+    }
+}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

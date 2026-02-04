@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 //apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.udesk'
 
@@ -34,30 +35,29 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17
     }
-}
-// 添加发布配置
-afterEvaluate {
+
     publishing {
-        publications {
-            // 创建一个名为 'release' 的发布任务
-            release(MavenPublication) {
-                // 从 release 组件创建发布内容
-                from components.release
-
-                // 这里的 groupId 建议遵循 JitPack 的多模块规范
-                // 格式：com.github.用户名.仓库名
-                groupId = 'com.github.LiuShuai92.UdeskSDK-Android'
-
-                // 这里的 artifactId 就是模块名
-                artifactId = 'UdeskSDKUI'
-
-                // 版本号通常跟随项目 git tag，这里可以动态获取或写死
-                version = 'v5.6.9'
-            }
+        singleVariant('release') {
+            withSourcesJar()
         }
     }
 }
 
+publishing {
+    publications {
+        release(MavenPublication) {
+            // 【关键点3】GroupId 和 ArtifactId
+            groupId = 'com.github.LiuShuai92.UdeskSDK-Android'
+            artifactId = 'UdeskSDKUI'
+            version = '5.7.0'
+
+            // 【关键点4】组件加载必须包在 afterEvaluate 里，否则有时候会报 "components not found"
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+}
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

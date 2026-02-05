@@ -59,6 +59,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.udesk.JsonUtils;
+import cn.udesk.LsUtils;
 import cn.udesk.PreferenceHelper;
 import cn.udesk.R;
 import cn.udesk.UdeskSDKManager;
@@ -1707,7 +1708,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 if (Activity.RESULT_OK == resultCode) {
                     if (photoUri != null && photoUri.getPath() != null) {
                         if (UdeskSDKManager.getInstance().getUdeskConfig().isScaleImg) {
-                            udeskViewMode.scaleBitmap(getApplicationContext(), UdeskUtil.parseOwnUri(photoUri, UdeskChatActivity.this, cameraFile), 0);
+                            udeskViewMode.scaleBitmap(getApplicationContext(), photoUri, 0);
                         } else {
                             udeskViewMode.sendFileMessage(this.getApplicationContext(), UdeskUtil.parseOwnUri(photoUri, this.getApplicationContext(), cameraFile), UdeskConst.ChatMsgTypeString.TYPE_IMAGE);
                         }
@@ -1759,7 +1760,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                             if (isOrigin) {
                                 udeskViewMode.sendFileMessage(this.getApplicationContext(), media.getPath(), UdeskConst.ChatMsgTypeString.TYPE_IMAGE);
                             } else {
-                                udeskViewMode.scaleBitmap(getApplicationContext(), media.getPath(), media.getOrientation());
+                                udeskViewMode.scaleBitmap(getApplicationContext(), Uri.fromFile(new File(media.getPath())), media.getOrientation());
                             }
                         }
                     }
@@ -1772,13 +1773,11 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 Uri mImageCaptureUri = data.getData();
                 if (mImageCaptureUri != null) {
                     try {
-                        if (mImageCaptureUri != null) {
-                            String path = UdeskUtil.getFilePath(getApplicationContext(), mImageCaptureUri);
-                            if (UdeskSDKManager.getInstance().getUdeskConfig().isScaleImg) {
-                                udeskViewMode.scaleBitmap(getApplicationContext(), path, 0);
-                            } else {
-                                udeskViewMode.sendFileMessage(this.getApplicationContext(), path, UdeskConst.ChatMsgTypeString.TYPE_IMAGE);
-                            }
+                        if (UdeskSDKManager.getInstance().getUdeskConfig().isScaleImg) {
+                            udeskViewMode.scaleBitmap(getApplicationContext(), mImageCaptureUri, 0);
+                        } else {
+                            File file = LsUtils.uriToFile(this.getApplicationContext(), mImageCaptureUri);
+                            udeskViewMode.sendFileMessage(this.getApplicationContext(), file.getPath(), UdeskConst.ChatMsgTypeString.TYPE_IMAGE);
                         }
 
                     } catch (Exception e) {
@@ -1857,8 +1856,8 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
     private void sendFile(Uri uri) {
         String path = uri.getPath();
         try {
-            Log.d(TAG, "sendFile: path = " + path);
-            long size = UdeskUtil.getFileSizeQ(this, uri);
+            Log.d(TAG, "sendFile: path = " + uri);
+            long size = LsUtils.getFileSize(this, uri);
             if (size >= 30 * 1000 * 1000) {
                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.udesk_file_to_large));
                 return;
@@ -1866,10 +1865,12 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
                 UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.udesk_file_not_exist));
                 return;
             }
+
+            File cacheFile = LsUtils.uriToFile(this.getApplicationContext(), uri);
             if (path.contains(".mp4")) {
-                udeskViewMode.sendFileMessage(this.getApplicationContext(), path, UdeskConst.ChatMsgTypeString.TYPE_SHORT_VIDEO);
+                udeskViewMode.sendFileMessage(this.getApplicationContext(), cacheFile.getPath(), UdeskConst.ChatMsgTypeString.TYPE_SHORT_VIDEO);
             } else {
-                udeskViewMode.sendFileMessage(this.getApplicationContext(), path, UdeskConst.ChatMsgTypeString.TYPE_FILE);
+                udeskViewMode.sendFileMessage(this.getApplicationContext(), cacheFile.getPath(), UdeskConst.ChatMsgTypeString.TYPE_FILE);
             }
         } catch (Exception e) {
 //            e.printStackTrace();
@@ -2059,6 +2060,7 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
 
     /**
      * 打开系统文件选择器
+     *
      * @param fileType 0=图片, 1=视频, 2=音频, 3=其他文件
      */
     private void openSystemFilePicker(int fileType, int requestCode) {

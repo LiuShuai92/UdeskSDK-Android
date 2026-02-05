@@ -2,6 +2,7 @@ package cn.udesk.aac;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -353,10 +354,11 @@ public class UdeskViewMode extends ViewModel {
     }
 
     //发送图片消息
-    public void scaleBitmap(final Context context,final String path,final int orientation) {
+    public void scaleBitmap(final Context context, final Uri uri, final int orientation) {
+        final String path = uri.getPath();
         try {
             if (!TextUtils.isEmpty(path)) {
-                File scaleImageFile = UdeskUtil.getScaleFile(context,path, orientation);
+                File scaleImageFile = UdeskUtil.getScaleFile(context,uri, orientation);
                 if (scaleImageFile != null) {
                     sendFileMessage(context, scaleImageFile.getPath(), UdeskConst.ChatMsgTypeString.TYPE_IMAGE);
                 } else {

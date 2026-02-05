@@ -50,6 +50,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1941,78 +1942,126 @@ public class UdeskUtil {
     }
 
     /**
-     * 缩略图
+     * 缩略图生成方法 (兼容 Android 10+ 及所有版本)
      *
-     * @param path
-     * @param context
-     * @return
+     * @param context     上下文
+     * @param uri         图片的 Uri (可以是 file:// 或 content://)
+     * @param orientation 图片旋转角度
+     * @return 压缩后的文件
      */
-    public static File getScaleFile(final Context context, String path, int orientation) {
+    public static File getScaleFile(final Context context, Uri uri, int orientation) {
+        if (uri == null) return null;
+
+        InputStream inputForBounds = null;
+        InputStream inputForDecode = null;
+        FileOutputStream fos = null;
+        Bitmap scaleImage = null;
+
         try {
-            Bitmap scaleImage = null;
-            byte[] data;
-            int max;
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            /**
-             * 在不分配空间状态下计算出图片的大小
-             */
-            options.inJustDecodeBounds = true;
-            decodeFileAndContent(context, path, options);
-            int width = options.outWidth;
-            int height = options.outHeight;
-            // 取得图片旋转角度
-            if (orientation == 90 || orientation == 270) {
-                options.outWidth = height;
-                options.outHeight = width;
-            }
-            max = Math.max(width, height);
-            options.inTempStorage = new byte[100 * 1024];
-            options.inJustDecodeBounds = false;
-            options.inPurgeable = true;
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            InputStream inStream;
-            if (UdeskUtil.isAndroidQ()) {
-                inStream = context.getContentResolver().openInputStream(Uri.parse(UdeskUtil.getFilePathQ(context, path)));
-            } else {
-                inStream = new FileInputStream(path);
-            }
-            data = UdeskUtil.readStream(inStream);
-            if (data == null || data.length <= 0) {
+            ContentResolver resolver = context.getContentResolver();
+
+            // 1. 第一遍打开流：只读取宽高，不加载图片到内存
+            try {
+                inputForBounds = resolver.openInputStream(uri);
+            } catch (FileNotFoundException e) {
+                // 如果 Uri 指向的文件不存在
                 return null;
-            }
-            String imageName = UdeskUtils.MD5(data);
-            File scaleImageFile = new File(getDirectoryPath(context, UdeskConst.FileImg) + File.separator + imageName + UdeskConst.ORIGINAL_SUFFIX);
-            if (!scaleImageFile.exists()) {
-                // 缩略图不存在，生成上传图
-                if (max > UdeskSDKManager.getInstance().getUdeskConfig().ScaleMax) {
-                    options.inSampleSize = max / UdeskSDKManager.getInstance().getUdeskConfig().ScaleMax;
-                } else {
-                    options.inSampleSize = 1;
-                }
-                FileOutputStream fos = new FileOutputStream(scaleImageFile);
-                scaleImage = BitmapFactory.decodeByteArray(data, 0,
-                        data.length, options);
-                // 取得图片旋转角度
-                if (orientation != 0) {
-                    scaleImage = rotaingImageView(orientation, scaleImage);
-                }
-                scaleImage.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-                fos.close();
             }
 
-            if (scaleImage != null) {
-                scaleImage.recycle();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            // 直接使用 decodeStream，避免读取 byte[] 造成 OOM
+            BitmapFactory.decodeStream(inputForBounds, null, options);
+            // 关流，为第二次读取做准备
+            if (inputForBounds != null) {
+                inputForBounds.close();
             }
-            if (TextUtils.isEmpty(scaleImageFile.getPath())) {
-                return null;
-            } else {
+
+            // 2. 计算缩放比例
+            int width = options.outWidth;
+            int height = options.outHeight;
+
+            // 如果读取失败
+            if (width <= 0 || height <= 0) return null;
+
+            // 处理旋转导致的宽高互换逻辑（用于计算缩放比）
+            if (orientation == 90 || orientation == 270) {
+                int temp = width;
+                width = height;
+                height = temp;
+            }
+
+            int max = Math.max(width, height);
+
+            // 获取配置的最大尺寸
+            int configScaleMax = UdeskSDKManager.getInstance().getUdeskConfig().ScaleMax;
+
+            // 计算 inSampleSize
+            options.inSampleSize = 1;
+            if (max > configScaleMax) {
+                options.inSampleSize = max / configScaleMax;
+            }
+
+            // 3. 准备目标文件
+            // 以前是 MD5(data)，现在为了不读流，改为 MD5(uri.toString())
+            // 只要 Uri 不变，文件名就不变，依然能命中缓存
+            String imageName = UdeskUtils.MD5(uri.toString());
+            File scaleImageFile = new File(getDirectoryPath(context, UdeskConst.FileImg) + File.separator + imageName + UdeskConst.ORIGINAL_SUFFIX);
+
+            // 如果缓存文件已存在且有效，直接返回，不再解码
+            if (scaleImageFile.exists() && scaleImageFile.length() > 0) {
                 return scaleImageFile;
             }
+
+            // 4. 第二遍打开流：真正解码图片
+            inputForDecode = resolver.openInputStream(uri);
+            options.inJustDecodeBounds = false;
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            // 这里的 inTempStorage 主要是为了给系统解码时提供复用内存
+            options.inTempStorage = new byte[16 * 1024];
+
+            scaleImage = BitmapFactory.decodeStream(inputForDecode, null, options);
+
+            if (scaleImage == null) {
+                return null;
+            }
+
+            // 5. 处理旋转
+            if (orientation != 0) {
+                Bitmap rotatedBitmap = rotaingImageView(orientation, scaleImage);
+                // 如果旋转生成了新的 Bitmap，回收旧的
+                if (rotatedBitmap != scaleImage) {
+                    scaleImage.recycle();
+                    scaleImage = rotatedBitmap;
+                }
+            }
+
+            // 6. 压缩保存到文件
+            fos = new FileOutputStream(scaleImageFile);
+            // 使用 JPEG 格式压缩，质量 80
+            scaleImage.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+            fos.flush();
+
+            return scaleImageFile;
 
         } catch (Exception e) {
             e.printStackTrace();
         } catch (OutOfMemoryError error) {
+            // 捕获 OOM，尝试主动回收
             error.printStackTrace();
+            System.gc();
+        } finally {
+            // 7. 统一资源释放
+            try {
+                if (inputForBounds != null) inputForBounds.close();
+                if (inputForDecode != null) inputForDecode.close();
+                if (fos != null) fos.close();
+                if (scaleImage != null && !scaleImage.isRecycled()) {
+                    scaleImage.recycle();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }

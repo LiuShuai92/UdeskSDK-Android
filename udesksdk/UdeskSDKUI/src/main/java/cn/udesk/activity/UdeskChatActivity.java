@@ -1596,75 +1596,12 @@ public class UdeskChatActivity extends UdeskBaseActivity implements IEmotionSele
 
     //点击相册入口
     public void clickPhoto() {
-        try {
-            if (Build.VERSION.SDK_INT < 23) {
-                selectPhoto();
-            } else {
-                String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-                if (Build.VERSION.SDK_INT >= 33) {
-                    permissions = new String[]{
-                            Manifest.permission.READ_MEDIA_IMAGES,
-                            Manifest.permission.READ_MEDIA_VIDEO,
-                            Manifest.permission.READ_EXTERNAL_STORAGE};
-                }
-
-                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
-                        false,
-                        true,
-                        getString(R.string.photo_direction),
-                        new RunPermissionHelper.OnRequestPermissionsListener() {
-                            @Override
-                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
-                                selectPhoto();
-                            }
-
-                            @Override
-                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
-                                UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.photo_denied));
-                            }
-                        },
-                        permissions);
-            }
-        } catch (Resources.NotFoundException e) {
-            e.printStackTrace();
-        }
+        selectPhoto();
     }
 
     //点击文件入口
     public void clickFile() {
-        try {
-            if (Build.VERSION.SDK_INT < 23) {
-                selectFile();
-            } else {
-                String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-                if (Build.VERSION.SDK_INT >= 33) {
-                    permissions = new String[]{
-                            Manifest.permission.READ_MEDIA_AUDIO,
-                            Manifest.permission.READ_MEDIA_IMAGES,
-                            Manifest.permission.READ_MEDIA_VIDEO,
-                            Manifest.permission.READ_EXTERNAL_STORAGE};
-                }
-
-                RunPermissionHelper.INSTANCE.requestRunPermission(UdeskChatActivity.this,
-                        false,
-                        true,
-                        getString(R.string.file_direction),
-                        new RunPermissionHelper.OnRequestPermissionsListener() {
-                            @Override
-                            public void onPermissionsGranted(int requestCode, @Nullable String[] permissions, @Nullable String[] permissionNames) {
-                                selectFile();
-                            }
-
-                            @Override
-                            public void onPermissionsDenied(int requestCode, @Nullable String[] deniedPermissions, @Nullable String[] deniedPermissionNames) {
-                                UdeskUtils.showToast(getApplicationContext(), getResources().getString(R.string.file_denied));
-                            }
-                        },
-                        permissions);
-            }
-        } catch (Resources.NotFoundException e) {
-            e.printStackTrace();
-        }
+        selectFile();
     }
 
     //点击评价入口

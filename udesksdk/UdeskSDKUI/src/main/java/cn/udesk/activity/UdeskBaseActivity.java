@@ -1,8 +1,14 @@
 package cn.udesk.activity;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import udesk.core.LocalManageUtil;
 
@@ -11,18 +17,18 @@ public class UdeskBaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 处理 Android 15/16 强制全屏导致的遮挡问题
+        // 调用适配方法
         handleWindowInsets();
     }
 
     private void handleWindowInsets() {
-        // 获取内容根视图（android.R.id.content）
+        // 获取 Activity 的根内容视图
         View rootView = findViewById(android.R.id.content);
         if (rootView != null) {
             ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
-                // 获取系统栏（状态栏、导航栏）的内边距
+                // 获取系统栏（状态栏和导航栏）占据的范围
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                // 为根视图设置 Padding，避开系统栏
+                // 通过设置 Padding 的方式，将内容推回安全区域，防止被状态栏遮挡
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
                 return WindowInsetsCompat.CONSUMED;
             });

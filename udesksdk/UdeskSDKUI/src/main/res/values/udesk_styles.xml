@@ -33,6 +33,7 @@
 
     <style name="Udesk_Theme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/udesk_color_f0f2f2</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
     </style>
 
 
